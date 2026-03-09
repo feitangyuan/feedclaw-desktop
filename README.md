@@ -45,12 +45,6 @@ xattr -dr com.apple.quarantine /Applications/养养龙虾.app
 ./install.sh src-tauri/target/release/bundle/macos/养养龙虾.app.zip
 ```
 
-如果后续把 `install.sh` 和 `zip` 放到 GitHub Releases，就可以变成：
-
-```bash
-curl -fsSL <install.sh 的 URL> | bash -s -- <app.zip 的 URL>
-```
-
 ## 👀 适用对象
 
 适合这几类用户：
