@@ -1,7 +1,6 @@
-# 养养龙虾
+# FeedClaw Desktop
 
-养养龙虾是一个给 `OpenClaw` 用的 macOS 桌面控制台。  
-它不替代 `OpenClaw` 本身，也不是聊天窗口；它负责把安装、模型接入、飞书、Skills、Token 和常见修复都收进一个 GUI。
+养养龙虾，面向 `OpenClaw` 的 macOS 桌面控制台。
 
 ![养养龙虾预览](public/preview.png)
 
@@ -67,12 +66,11 @@ curl -fsSL <install.sh 的 URL> | bash -s -- <app.zip 的 URL>
 
 - 想用 `OpenClaw`，但不想先记一堆命令
 - 想在 GUI 里完成 API、飞书、Gateway、Skills 管理
-- 想保留官方 CLI 能力，但不想天天手开终端
+- 想把常用运维动作收进一个桌面面板
 
 ## 当前边界
 
-- 真正运行时仍然是本机 `OpenClaw`
-- 真正聊天入口仍然在飞书，不在这个 app 里
+- 真正聊天入口仍然在飞书
 - 未加入 Apple Developer Program 前，分发包仍属于未签名测试版
 
 ## 开发
@@ -99,7 +97,7 @@ npm run tauri build
 
 一句话：
 
-**养养龙虾 = OpenClaw 的桌面控制台。**
+**FeedClaw Desktop = OpenClaw 的桌面控制台。**
 
 ### 外部运行时层
 
