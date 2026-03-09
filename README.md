@@ -18,7 +18,11 @@ FeedClaw Desktop，也叫「养养龙虾」，面向 `OpenClaw` 的 macOS 桌面
 
 ### 方式一：直接下载 app
 
-当前推荐对外分发的是：
+安装包放在 GitHub 的 **Releases** 页面：
+
+- https://github.com/feitangyuan/feedclaw-desktop/releases
+
+当前推荐下载：
 
 - `养养龙虾.app.zip`
 
