@@ -39,10 +39,10 @@ xattr -dr com.apple.quarantine /Applications/养养龙虾.app
 - 去掉 quarantine
 - 打开 app
 
-本地测试命令：
+本地使用：
 
 ```bash
-./install.sh src-tauri/target/release/bundle/macos/养养龙虾.app.zip
+./install.sh /path/to/养养龙虾.app.zip
 ```
 
 ## 👀 适用对象
@@ -53,42 +53,16 @@ xattr -dr com.apple.quarantine /Applications/养养龙虾.app
 - 想在 GUI 里完成 API、飞书、Gateway、Skills 管理
 - 想把常用运维动作收进一个桌面面板
 
-## 🛠️ 开发
+## ✅ 当前支持
 
-```bash
-npm install
-npm run tauri dev
-```
+- macOS
+- `OpenClaw` 本地安装与更新
+- `API Key` / `OpenAI Codex OAuth`
+- 飞书接入、配对、Gateway 管理
+- Skills 安装与卸载
+- Token 查看与基础诊断
 
-构建正式包：
-
-```bash
-npm run tauri build
-```
-
-## 🧩 技术栈
-
-- Tauri 2
-- React 19
-- TypeScript
-- Rust
-
-## 🦞 项目定位
-
-一句话：
-
-**FeedClaw Desktop = OpenClaw 的桌面控制台。**
-
-### 外部运行时层
-
-真正执行工作的是：
-
-- 本机 `openclaw` CLI
-- `~/.openclaw/openclaw.json`
-- `~/.openclaw/agents/*`
-- Gateway 进程
-- LaunchAgent
-- Feishu / skills / logs / sessions
+如果你本机的 `OpenClaw` 版本较旧，建议先在 app 的“运行状态”页更新，再使用 `OAuth` 登录。
 
 ## 目录结构
 
@@ -122,38 +96,29 @@ src-tauri/
 └── tauri.conf.json
 ```
 
-## 开发命令
+## 🛠️ 开发
 
 ```bash
 npm install
 npm run tauri dev
 ```
 
-## 校验命令
+构建正式包：
+
+```bash
+npm run tauri build
+```
+
+校验命令：
 
 ```bash
 npm run build
 cargo check --manifest-path src-tauri/Cargo.toml
 ```
 
-## 运行时路径
+## 🧩 技术栈
 
-当前项目实际会用到这些 `openclaw` 路径：
-
-- `~/.openclaw/config.json`
-- `~/.openclaw/openclaw.json`
-- `~/.openclaw/agents/*/sessions/`
-- `~/.openclaw/logs/`
-- `~/.openclaw/workspace/`
-- `/tmp/openclaw/`
-
-## 当前支持
-
-- macOS
-- `OpenClaw` 本地安装与更新
-- `API Key` / `OpenAI Codex OAuth`
-- 飞书接入、配对、Gateway 管理
-- Skills 安装与卸载
-- Token 查看与基础诊断
-
-真正的 Agent Runtime 和真正的对话执行，还是 `openclaw` 本身。
+- Tauri 2
+- React 19
+- TypeScript
+- Rust
