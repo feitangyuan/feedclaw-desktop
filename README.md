@@ -1,10 +1,10 @@
 # FeedClaw Desktop
 
-养养龙虾，面向 `OpenClaw` 的 macOS 桌面控制台。
+FeedClaw Desktop，也叫「养养龙虾」，面向 `OpenClaw` 的 macOS 桌面控制台。
 
 ![养养龙虾预览](public/preview.png)
 
-## 它能做什么
+## ✨ 它能做什么
 
 - 一键安装、更新、彻底卸载 `openclaw`
 - 接入模型：`API Key` 和 `OpenAI Codex OAuth`
@@ -14,16 +14,7 @@
 - 查看 Token 趋势、模型明细、最近调用
 - 做常见问题检查和修复
 
-## 当前页面
-
-- `运行状态`
-- `模型接入`
-- `飞书`
-- `Skills`
-- `Token`
-- `治疗龙虾`
-
-## 安装方式
+## 🚀 安装方式
 
 ### 方式一：直接下载 app
 
@@ -60,7 +51,7 @@ xattr -dr com.apple.quarantine /Applications/养养龙虾.app
 curl -fsSL <install.sh 的 URL> | bash -s -- <app.zip 的 URL>
 ```
 
-## 适用对象
+## 👀 适用对象
 
 适合这几类用户：
 
@@ -68,12 +59,12 @@ curl -fsSL <install.sh 的 URL> | bash -s -- <app.zip 的 URL>
 - 想在 GUI 里完成 API、飞书、Gateway、Skills 管理
 - 想把常用运维动作收进一个桌面面板
 
-## 当前边界
+## ⚠️ 当前边界
 
 - 真正聊天入口仍然在飞书
 - 未加入 Apple Developer Program 前，分发包仍属于未签名测试版
 
-## 开发
+## 🛠️ 开发
 
 ```bash
 npm install
@@ -86,14 +77,14 @@ npm run tauri dev
 npm run tauri build
 ```
 
-## 技术栈
+## 🧩 技术栈
 
 - Tauri 2
 - React 19
 - TypeScript
 - Rust
 
-## 项目定位
+## 🦞 项目定位
 
 一句话：
 
