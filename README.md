@@ -147,77 +147,13 @@ cargo check --manifest-path src-tauri/Cargo.toml
 - `~/.openclaw/workspace/`
 - `/tmp/openclaw/`
 
-## 当前已知边界
+## 当前支持
 
-### 平台
-
-- 当前主要面向 macOS
-- Windows / Linux 没有作为当前发布目标
-
-### 安装
-
-- 一键安装依赖网络、Homebrew、Node/npm 环境
-- 首次安装可能触发系统权限或 sudo
-
-### 上游 CLI 不稳定项
-
-养养龙虾已经做了一层兼容，但 `openclaw 2026.3.7` 仍有一些上游行为需要认识到：
-
-- `doctor` 输出有时存在误报或文案矛盾
-- `doctor --fix` 不是所有问题都能自动修
-- 某些配置变更需要重启 Gateway 才生效
-- `security audit` 会发现风险，但不一定提供自动 fix
-
-## 审计快照
-
-以 2026 年 3 月 9 日这轮本地审计为准，当前结果是：
-
-- 功能校验通过：`npm run build`
-- Rust 校验通过：`cargo check --manifest-path src-tauri/Cargo.toml`
-- 上游 `openclaw doctor` 仍有假阳性
-  - 会把 `loopback` 误报成 `0.0.0.0`
-  - 会先报 `Gateway not running`，后面又报 `Runtime: running`
-- 上游 `openclaw security audit --deep` 当前扫到 3 条重点告警
-  - `channels.feishu.tools.doc` 仍允许创建文档并授予请求者权限
-  - `plugins.allow` 还没显式锁定白名单
-  - `gateway probe failed (deep)` 在当前机器上会报本地 `EPERM`，更像探测噪音，不一定等于网关不可用
-
-这意味着当前版本已经能交付使用，但安全默认值还可以再收紧，尤其是：
-
-- 不需要飞书文档工具时，直接关掉
-- 给插件加显式 allowlist
-- 把 `security audit --deep` 的结果继续翻译成更直接的页面修复动作
-
-## 明确待做
-
-- 完成左上角品牌 SVG / logo，替换当前临时图标
-- 做 `彻底卸载` 功能
-- 把 `plugins.allow` 和飞书文档工具权限继续收紧成页面可操作项
-- 继续细化 Token 体检的上下文归因
-
-### Token 优化不是万能省费器
-
-当前 Token 体检已经能动态发现一部分高频浪费项，但它仍不是完整的“全自动成本优化器”。
-
-它现在更像：
-
-- 一个基于官方文档和本机日志的动态检查器
-- 一个对高频问题给出可执行治疗动作的工具
-
-## 推荐理解方式
-
-如果只用一句话理解这个项目：
-
-养养龙虾 = `openclaw` 的中文图形化控制台。
-
-它负责：
-
-- 安装
-- 配置
-- 接飞书
-- 控网关
-- 管技能
-- 看 Token
-- 做常见修复
+- macOS
+- `OpenClaw` 本地安装与更新
+- `API Key` / `OpenAI Codex OAuth`
+- 飞书接入、配对、Gateway 管理
+- Skills 安装与卸载
+- Token 查看与基础诊断
 
 真正的 Agent Runtime 和真正的对话执行，还是 `openclaw` 本身。
