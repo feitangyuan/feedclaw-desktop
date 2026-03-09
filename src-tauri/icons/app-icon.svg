@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" fill="none">
+  <rect x="72" y="72" width="880" height="880" rx="208" fill="#FFFFFF"/>
+  <g transform="translate(124 122) scale(3.08)">
+    <path
+      d="M 70 160 C 40 110, 90 40, 150 50 C 145 70, 130 100, 135 125 C 140 140, 180 100, 200 80 C 220 100, 160 180, 105 195"
+      stroke="#1D1D1F"
+      stroke-width="12"
+      stroke-linecap="butt"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M 56 164 L 71 179 L 56 194"
+      stroke="#0EA5E9"
+      stroke-width="10"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <line
+      x1="76"
+      y1="194"
+      x2="96"
+      y2="194"
+      stroke="#0EA5E9"
+      stroke-width="10"
+      stroke-linecap="butt"
+    />
+  </g>
+</svg>
