@@ -59,11 +59,6 @@ curl -fsSL <install.sh 的 URL> | bash -s -- <app.zip 的 URL>
 - 想在 GUI 里完成 API、飞书、Gateway、Skills 管理
 - 想把常用运维动作收进一个桌面面板
 
-## ⚠️ 当前边界
-
-- 真正聊天入口仍然在飞书
-- 未加入 Apple Developer Program 前，分发包仍属于未签名测试版
-
 ## 🛠️ 开发
 
 ```bash
