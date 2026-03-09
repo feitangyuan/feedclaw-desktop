@@ -2,7 +2,6 @@
 name = "runclaw"
 version = "0.1.0"
 description = "RunClaw - Desktop GUI for openclaw CLI"
-authors = ["Patrick"]
 edition = "2021"
 
 [lib]

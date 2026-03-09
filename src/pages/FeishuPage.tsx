@@ -229,7 +229,7 @@ export function FeishuPage() {
                 type="text"
                 value={pairingCode}
                 onChange={(e) => setPairingCode(e.target.value.toUpperCase())}
-                placeholder="FS2HPA4D"
+                placeholder="ABCD1234"
                 style={{
                   width: 180, padding: "6px 12px", borderRadius: 8, fontSize: 13,
                   background: "var(--card-bg)", border: "none", color: "var(--text-primary)",
