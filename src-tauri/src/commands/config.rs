@@ -1,4 +1,5 @@
 use dirs::home_dir;
+use regex::Regex;
 use std::path::PathBuf;
 use tauri::Emitter;
 use tokio::fs;
@@ -190,6 +191,32 @@ fn configured_model_key_for_provider(provider: &str) -> Option<&'static str> {
 
 fn applescript_escape(value: &str) -> String {
     value.replace('\\', "\\\\").replace('"', "\\\"")
+}
+
+fn parse_openclaw_version_triplet(raw: &str) -> Option<(u32, u32, u32)> {
+    let regex = Regex::new(r"(\d{4})\.(\d{1,2})\.(\d{1,2})").ok()?;
+    let captures = regex.captures(raw)?;
+    let year = captures.get(1)?.as_str().parse().ok()?;
+    let month = captures.get(2)?.as_str().parse().ok()?;
+    let day = captures.get(3)?.as_str().parse().ok()?;
+    Some((year, month, day))
+}
+
+async fn ensure_openai_codex_oauth_supported() -> Result<(), String> {
+    let version_output = run_shell("openclaw --version 2>&1").await?;
+    let Some(current) = parse_openclaw_version_triplet(&version_output) else {
+        return Ok(());
+    };
+
+    let minimum = (2026, 3, 7);
+    if current < minimum {
+        return Err(format!(
+            "当前 OpenClaw 版本过旧（检测到 {}）。请先在“运行状态”页更新 OpenClaw 到 2026.3.7 或更新版本后，再使用 OAuth 登录。",
+            version_output.trim()
+        ));
+    }
+
+    Ok(())
 }
 
 fn normalize_provider(provider: &str) -> &str {
@@ -811,6 +838,7 @@ pub async fn login_model_oauth(provider: String, window: tauri::Window) -> Resul
     if provider != "openai-codex" {
         return Err("当前只支持 OpenAI Codex 的 OAuth 登录。".to_string());
     }
+    ensure_openai_codex_oauth_supported().await?;
 
     emit_oauth_line(
         &window,
