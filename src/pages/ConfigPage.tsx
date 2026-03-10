@@ -248,6 +248,7 @@ export function ConfigPage() {
     ]);
     setConfig(nextConfig);
     setAuthStatus(nextAuthStatus);
+    setError(null);
     lastSavedSignatureRef.current = JSON.stringify({
       provider: nextConfig.provider ?? "",
       api_key: nextConfig.api_key ?? "",
@@ -260,7 +261,10 @@ export function ConfigPage() {
 
   useEffect(() => {
     readThinkingDefault()
-      .then((value) => setThinkingLevel(value ?? "low"))
+      .then((value) => {
+        setThinkingLevel(value ?? "low");
+        setError(null);
+      })
       .catch((e) => setError(String(e)));
   }, []);
 
@@ -281,6 +285,7 @@ export function ConfigPage() {
         setOauthModels(normalized);
         const current = normalized.find((item) => item.is_default)?.key ?? normalized[0]?.key ?? "";
         setSelectedOauthModel(current);
+        setError(null);
       })
       .catch((e) => setError(String(e)));
   }, [authStatus?.openai_codex_logged_in, authStatus?.resolved_default, authStatus?.default_model]);

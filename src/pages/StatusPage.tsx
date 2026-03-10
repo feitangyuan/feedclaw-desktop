@@ -402,42 +402,51 @@ export function StatusPage({ onNavigate }: StatusPageProps) {
           <div
             className="glass-card"
             style={{
-              padding: "16px 20px",
-              display: "grid",
-              gridTemplateColumns: isInstalled ? "1fr 1fr auto" : "1fr 1fr",
-              columnGap: 20,
-              rowGap: 14,
-              alignItems: "end",
+              padding: "18px 20px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 18,
             }}
           >
-            <InfoRow label="状态">
-              <span style={{ fontWeight: 600, color: isInstalled ? "var(--accent-green)" : "var(--accent-red)" }}>
-                {isInstalled ? "已安装" : "未找到"}
-              </span>
-            </InfoRow>
-            {info.version ? (
-              <InfoRow label="版本">
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{info.version}</span>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: isInstalled ? "minmax(0, 1fr) minmax(0, 1fr) auto" : "minmax(0, 1fr) minmax(0, 1fr)",
+                columnGap: 24,
+                rowGap: 12,
+                alignItems: "start",
+              }}
+            >
+              <InfoRow label="状态">
+                <span style={{ fontWeight: 600, color: isInstalled ? "var(--accent-green)" : "var(--accent-red)" }}>
+                  {isInstalled ? "已安装" : "未找到"}
+                </span>
               </InfoRow>
-            ) : (
-              <div />
-            )}
-            {isInstalled && (
-              <div style={{ display: "flex", justifyContent: "flex-end", alignSelf: "center" }}>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <AppButton onClick={handleUpdate} disabled={updating || uninstalling} size="sm">
-                    <Download size={12} />
-                    {updating ? "更新中…" : "更新版本"}
-                  </AppButton>
-                  <AppButton onClick={handleUninstall} disabled={uninstalling || updating} tone="redSubtle" size="sm">
-                    <Trash2 size={12} />
-                    {uninstalling ? "卸载中…" : "彻底卸载"}
-                  </AppButton>
+              <InfoRow label="版本">
+                {info.version ? (
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{info.version}</span>
+                ) : (
+                  <span style={{ color: "var(--text-tertiary)" }}>—</span>
+                )}
+              </InfoRow>
+              {isInstalled && (
+                <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", minHeight: 48 }}>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <AppButton onClick={handleUpdate} disabled={updating || uninstalling} size="sm">
+                      <Download size={12} />
+                      {updating ? "更新中…" : "更新版本"}
+                    </AppButton>
+                    <AppButton onClick={handleUninstall} disabled={uninstalling || updating} tone="redSubtle" size="sm">
+                      <Trash2 size={12} />
+                      {uninstalling ? "卸载中…" : "彻底卸载"}
+                    </AppButton>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+
             {info.path && (
-              <div style={{ gridColumn: isInstalled ? "1 / 4" : "1 / 3" }}>
+              <div>
                 <InfoRow label="路径">
                   <span
                     style={{

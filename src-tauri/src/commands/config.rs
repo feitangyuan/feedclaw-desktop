@@ -1,5 +1,6 @@
 use dirs::home_dir;
 use regex::Regex;
+use std::io::ErrorKind;
 use std::path::PathBuf;
 use tauri::Emitter;
 use tokio::fs;
@@ -89,7 +90,11 @@ fn auth_profiles_path() -> Result<PathBuf, String> {
 async fn clear_agent_model_cache() -> Result<(), String> {
     let path = main_agent_dir()?.join("models.json");
     if path.exists() {
-        fs::remove_file(path).await.map_err(|e| e.to_string())?;
+        match fs::remove_file(path).await {
+            Ok(()) => {}
+            Err(error) if error.kind() == ErrorKind::NotFound => {}
+            Err(error) => return Err(error.to_string()),
+        }
     }
     Ok(())
 }
@@ -102,10 +107,25 @@ async fn sanitize_legacy_agent_model_cache() -> Result<(), String> {
 
     let content = fs::read_to_string(&path).await.map_err(|e| e.to_string())?;
     if content.contains("requiresOpenAiAnthropicToolPayload") {
-        fs::remove_file(path).await.map_err(|e| e.to_string())?;
+        match fs::remove_file(path).await {
+            Ok(()) => {}
+            Err(error) if error.kind() == ErrorKind::NotFound => {}
+            Err(error) => return Err(error.to_string()),
+        }
     }
 
     Ok(())
+}
+
+async fn read_json_value_if_exists(path: &PathBuf) -> Result<Option<serde_json::Value>, String> {
+    match fs::read_to_string(path).await {
+        Ok(content) => {
+            let value = serde_json::from_str(&content).map_err(|e| e.to_string())?;
+            Ok(Some(value))
+        }
+        Err(error) if error.kind() == ErrorKind::NotFound => Ok(None),
+        Err(error) => Err(error.to_string()),
+    }
 }
 
 async fn run_shell_with_legacy_model_retry(command: &str) -> Result<String, String> {
@@ -664,33 +684,18 @@ fn merge_auth_profiles_into_config(value: &serde_json::Value, config: &mut OpenC
 pub async fn read_config() -> Result<OpenClawConfig, String> {
     let mut config = OpenClawConfig::default();
     let cache_path = cache_config_path()?;
-    if cache_path.exists() {
-        let content = fs::read_to_string(&cache_path)
-            .await
-            .map_err(|e| e.to_string())?;
-        let value: serde_json::Value =
-            serde_json::from_str(&content).map_err(|e| e.to_string())?;
+    if let Some(value) = read_json_value_if_exists(&cache_path).await? {
         let obj = value.as_object().cloned().unwrap_or_default();
         merge_cache_into_config(&obj, &mut config);
     }
 
     let runtime_path = runtime_config_path()?;
-    if runtime_path.exists() {
-        let content = fs::read_to_string(&runtime_path)
-            .await
-            .map_err(|e| e.to_string())?;
-        let value: serde_json::Value =
-            serde_json::from_str(&content).map_err(|e| e.to_string())?;
+    if let Some(value) = read_json_value_if_exists(&runtime_path).await? {
         merge_runtime_into_config(&value, &mut config);
     }
 
     let auth_path = auth_profiles_path()?;
-    if auth_path.exists() {
-        let content = fs::read_to_string(&auth_path)
-            .await
-            .map_err(|e| e.to_string())?;
-        let value: serde_json::Value =
-            serde_json::from_str(&content).map_err(|e| e.to_string())?;
+    if let Some(value) = read_json_value_if_exists(&auth_path).await? {
         merge_auth_profiles_into_config(&value, &mut config);
     }
 
