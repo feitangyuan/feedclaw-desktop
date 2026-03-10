@@ -68,6 +68,8 @@ xattr -dr com.apple.quarantine /Applications/养养龙虾.app
 
 如果你本机的 `OpenClaw` 版本较旧，建议先在 app 的“运行状态”页更新，再使用 `OAuth` 登录。
 
+`OpenAI Codex OAuth` 会拉起系统 `Terminal` 完成官方授权流程，这是当前 `OpenClaw` CLI 的要求。
+
 ## 目录结构
 
 ```text

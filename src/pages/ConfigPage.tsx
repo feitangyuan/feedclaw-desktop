@@ -34,6 +34,10 @@ const THINKING_OPTIONS = [
   { value: "high", label: "high" },
 ];
 
+function delay(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
 function versionWeight(key: string) {
   const match = key.match(/gpt-(\d+)(?:\.(\d+))?/i);
   if (!match) {
@@ -252,6 +256,7 @@ export function ConfigPage() {
       provider: nextConfig.provider ?? "",
       api_key: nextConfig.api_key ?? "",
     });
+    return { nextConfig, nextAuthStatus };
   }, []);
 
   useEffect(() => {
@@ -354,16 +359,30 @@ export function ConfigPage() {
         }
       },
       async (result) => {
-        setOauthing(false);
         if (result !== "success") {
+          setOauthing(false);
           setError("OAuth 登录失败");
           return;
         }
-        setOauthHint("已打开 Terminal。请在终端里完成 OAuth 登录，完成后回到养养龙虾即可。");
         try {
-          await refresh();
+          setOauthHint("已打开 Terminal。请在终端里完成 OAuth 登录，登录完成后这里会自动识别。");
+          let detected = false;
+          for (let i = 0; i < 45; i += 1) {
+            const { nextAuthStatus } = await refresh();
+            if (nextAuthStatus.openai_codex_logged_in) {
+              setOauthHint("OpenAI Codex 已接入。");
+              detected = true;
+              break;
+            }
+            await delay(2000);
+          }
+          if (!detected) {
+            setOauthHint("已打开 Terminal。登录完成后回到这里，点一下页面或重新进入本页即可刷新。");
+          }
         } catch (e) {
           setError(String(e));
+        } finally {
+          setOauthing(false);
         }
       }
     );
