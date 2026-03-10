@@ -229,8 +229,7 @@ export function ConfigPage() {
   const [resetDone, setResetDone] = useState(false);
   const [resetLines, setResetLines] = useState<string[]>([]);
   const [oauthing, setOauthing] = useState(false);
-  const [oauthDone, setOauthDone] = useState(false);
-  const [oauthLines, setOauthLines] = useState<string[]>([]);
+  const [oauthHint, setOauthHint] = useState<string | null>(null);
   const [oauthModels, setOauthModels] = useState<ConfiguredModel[]>([]);
   const [selectedOauthModel, setSelectedOauthModel] = useState("");
   const [thinkingLevel, setThinkingLevel] = useState("low");
@@ -345,18 +344,22 @@ export function ConfigPage() {
 
   const handleOauthLogin = () => {
     setOauthing(true);
-    setOauthDone(false);
-    setOauthLines([]);
+    setOauthHint(null);
     setError(null);
     loginModelOauth(
       "openai-codex",
-      (line) => setOauthLines((prev) => [...prev, line]),
+      (line) => {
+        if (line) {
+          setOauthHint(line);
+        }
+      },
       async (result) => {
-        setOauthDone(true);
+        setOauthing(false);
         if (result !== "success") {
           setError("OAuth 登录失败");
           return;
         }
+        setOauthHint("已打开 Terminal。请在终端里完成 OAuth 登录，完成后回到养养龙虾即可。");
         try {
           await refresh();
         } catch (e) {
@@ -710,6 +713,21 @@ export function ConfigPage() {
         </div>
       </div>
 
+      {oauthHint && (
+        <div
+          style={{
+            padding: "10px 14px",
+            borderRadius: 8,
+            fontSize: 13,
+            background: "rgba(52, 199, 89, 0.1)",
+            color: "var(--accent-green)",
+            border: "1px solid rgba(52, 199, 89, 0.18)",
+          }}
+        >
+          {oauthHint}
+        </div>
+      )}
+
       {error && (
         <div style={{ padding: "10px 14px", borderRadius: 8, fontSize: 13, background: "rgba(255, 59, 48, 0.1)", color: "var(--accent-red)", border: "1px solid rgba(255, 59, 48, 0.2)" }}>
           {error}
@@ -724,18 +742,6 @@ export function ConfigPage() {
         onClose={() => {
           if (resetDone) {
             setResetting(false);
-          }
-        }}
-      />
-
-      <TerminalOverlay
-        title="oauth login"
-        lines={oauthLines}
-        open={oauthing}
-        done={oauthDone}
-        onClose={() => {
-          if (oauthDone) {
-            setOauthing(false);
           }
         }}
       />

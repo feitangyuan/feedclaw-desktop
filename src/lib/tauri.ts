@@ -352,6 +352,8 @@ export const loginModelOauth = (
   });
 
   invoke("login_model_oauth", { provider }).catch((error) => {
+    onLine(String(error));
+    onDone("error");
     console.error(error);
   });
 };
