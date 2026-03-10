@@ -6,7 +6,7 @@ use tauri::Emitter;
 use tokio::fs;
 use tokio::process::Command;
 
-use crate::commands::gateway::reset_feishu_sessions;
+use crate::commands::gateway::{reset_feishu_sessions, restart_gateway};
 use crate::commands::runtime::{clean_openclaw_output, run_shell, shell_escape};
 
 #[derive(serde::Serialize, serde::Deserialize, Clone, Debug, Default)]
@@ -935,14 +935,8 @@ pub async fn switch_active_model(model: String, window: tauri::Window) -> Result
     sync_primary_model(&model).await?;
     clear_agent_model_cache().await?;
     emit_model_switch_line(&window, "默认模型已更新，正在重启网关…").await?;
-
-    let restart_output = run_shell("openclaw gateway restart 2>&1").await?;
-    let cleaned = clean_openclaw_output(&restart_output);
-    if !cleaned.is_empty() {
-        for line in cleaned.lines() {
-            emit_model_switch_line(&window, line).await?;
-        }
-    }
+    restart_gateway().await?;
+    emit_model_switch_line(&window, "网关已重启。").await?;
 
     match reset_feishu_sessions().await {
         Ok(message) => {

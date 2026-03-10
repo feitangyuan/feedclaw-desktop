@@ -309,6 +309,17 @@ fn normalize_provider(provider: &str) -> &str {
     }
 }
 
+fn default_model_for_provider(provider: &str) -> Option<&'static str> {
+    match provider {
+        "kimi" => Some("kimi-coding/k2p5"),
+        "moonshot" => Some("moonshot/moonshot-v1-8k"),
+        "minimax" => Some("minimax/minimax-text-01"),
+        "anthropic" => Some("anthropic/claude-opus-4-6"),
+        "openai" => Some("openai/gpt-5"),
+        _ => None,
+    }
+}
+
 async fn restore_runtime_from_preserved_config(window: &tauri::Window) -> Result<(), String> {
     let preserved = read_preserved_runtime_config().await?;
     let provider = preserved.provider.as_deref().map(normalize_provider);
@@ -340,6 +351,13 @@ async fn restore_runtime_from_preserved_config(window: &tauri::Window) -> Result
             run_shell("openclaw config set gateway.mode local").await?;
             run_shell("openclaw config set gateway.bind custom").await?;
             run_shell("openclaw config set gateway.customBindHost 127.0.0.1").await?;
+            if let Some(model_key) = default_model_for_provider(provider) {
+                run_shell(&format!(
+                    "openclaw config set agents.defaults.model.primary {}",
+                    shell_escape(model_key)
+                ))
+                .await?;
+            }
         }
     }
 
@@ -354,6 +372,9 @@ async fn restore_runtime_from_preserved_config(window: &tauri::Window) -> Result
         prepare_stock_feishu_plugin().await?;
         run_shell("openclaw config set plugins.entries.feishu.enabled true").await?;
         run_shell("openclaw config set channels.feishu.enabled true").await?;
+        run_shell("openclaw config set channels.feishu.defaultAccount main").await?;
+        run_shell("openclaw config set channels.feishu.accounts.main.enabled true").await?;
+        run_shell("openclaw config set channels.feishu.accounts.default.enabled false").await?;
         run_shell(&format!(
             "openclaw config set channels.feishu.accounts.main.appId {}",
             shell_escape(app_id)
@@ -365,7 +386,7 @@ async fn restore_runtime_from_preserved_config(window: &tauri::Window) -> Result
         ))
         .await?;
         run_shell(&format!(
-            "openclaw config set channels.feishu.accounts.default.dmPolicy {}",
+            "openclaw config set channels.feishu.accounts.main.dmPolicy {}",
             shell_escape(dm_policy)
         ))
         .await?;

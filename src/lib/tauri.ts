@@ -370,6 +370,8 @@ export const switchActiveModel = (
   });
 
   invoke("switch_active_model", { model }).catch((error) => {
+    onLine(String(error));
+    onDone("error");
     console.error(error);
   });
 };
