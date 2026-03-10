@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Activity, Settings, Puzzle, BarChart3, MessageSquare, Stethoscope, Palette, LucideIcon } from "lucide-react";
+import { Activity, Settings, Puzzle, BarChart3, MessageSquare, Stethoscope, Palette, Info, LucideIcon } from "lucide-react";
 
-export type Page = "status" | "diagnosis" | "config" | "skills" | "usage" | "feishu";
+export type Page = "status" | "config" | "feishu" | "skills" | "usage" | "diagnosis" | "about";
 
 const navItems: { id: Page; label: string; Icon: LucideIcon }[] = [
   { id: "status", label: "运行状态", Icon: Activity },
@@ -10,6 +10,7 @@ const navItems: { id: Page; label: string; Icon: LucideIcon }[] = [
   { id: "skills", label: "Skills", Icon: Puzzle },
   { id: "usage", label: "Token", Icon: BarChart3 },
   { id: "diagnosis", label: "治疗龙虾", Icon: Stethoscope },
+  { id: "about", label: "关于", Icon: Info },
 ];
 
 interface SidebarProps {

@@ -108,6 +108,17 @@ async fn sanitize_legacy_agent_model_cache() -> Result<(), String> {
     Ok(())
 }
 
+async fn run_shell_with_legacy_model_retry(command: &str) -> Result<String, String> {
+    match run_shell(command).await {
+        Ok(output) => Ok(output),
+        Err(error) if error.contains("requiresOpenAiAnthropicToolPayload") => {
+            clear_agent_model_cache().await?;
+            run_shell(command).await
+        }
+        Err(error) => Err(error),
+    }
+}
+
 fn global_feishu_extension_dir() -> Result<PathBuf, String> {
     home_dir()
         .map(|h| h.join(".openclaw").join("extensions").join("feishu"))
@@ -275,16 +286,17 @@ async fn sync_provider_config(config: &OpenClawConfig) -> Result<(), String> {
     };
 
     let api_key = shell_escape(api_key);
-    run_shell("openclaw doctor --fix >/dev/null 2>&1 || true").await?;
-    run_shell(&format!(
+    run_shell_with_legacy_model_retry("openclaw doctor --fix >/dev/null 2>&1 || true").await?;
+    run_shell_with_legacy_model_retry(&format!(
         "openclaw onboard --non-interactive --accept-risk --mode local \
          --auth-choice {auth_choice} {api_flag} {api_key} \
          --skip-channels --skip-daemon --skip-skills --skip-ui --skip-health \
          --gateway-bind loopback --gateway-port 18789"
     ))
     .await?;
-    run_shell("openclaw config set gateway.bind custom").await?;
-    run_shell("openclaw config set gateway.customBindHost 127.0.0.1").await?;
+    run_shell_with_legacy_model_retry("openclaw config set gateway.bind custom").await?;
+    run_shell_with_legacy_model_retry("openclaw config set gateway.customBindHost 127.0.0.1")
+        .await?;
 
     Ok(())
 }
@@ -305,26 +317,32 @@ async fn sync_feishu_config(config: &OpenClawConfig) -> Result<(), String> {
     let dm_policy = shell_escape(dm_policy);
 
     prepare_stock_feishu_plugin().await?;
-    run_shell("openclaw config set plugins.entries.feishu.enabled true").await?;
-    run_shell("openclaw config set channels.feishu.enabled true").await?;
-    run_shell(&format!(
+    run_shell_with_legacy_model_retry("openclaw config set plugins.entries.feishu.enabled true")
+        .await?;
+    run_shell_with_legacy_model_retry("openclaw config set channels.feishu.enabled true").await?;
+    run_shell_with_legacy_model_retry(&format!(
         "openclaw config set channels.feishu.accounts.main.appId {app_id}"
     ))
     .await?;
-    run_shell(&format!(
+    run_shell_with_legacy_model_retry(&format!(
         "openclaw config set channels.feishu.accounts.main.appSecret {app_secret}"
     ))
     .await?;
-    run_shell(&format!(
+    run_shell_with_legacy_model_retry(&format!(
         "openclaw config set channels.feishu.accounts.default.dmPolicy {dm_policy}"
     ))
     .await?;
 
     if config.dm_policy.as_deref() == Some("open") {
-        run_shell(r#"openclaw config set channels.feishu.allowFrom '["*"]' --strict-json"#).await?;
+        run_shell_with_legacy_model_retry(
+            r#"openclaw config set channels.feishu.allowFrom '["*"]' --strict-json"#,
+        )
+        .await?;
     } else {
-        run_shell("openclaw config unset channels.feishu.allowFrom >/dev/null 2>&1 || true")
-            .await?;
+        run_shell_with_legacy_model_retry(
+            "openclaw config unset channels.feishu.allowFrom >/dev/null 2>&1 || true",
+        )
+        .await?;
     }
 
     cleanup_feishu_plugin_install().await?;
@@ -334,7 +352,10 @@ async fn sync_feishu_config(config: &OpenClawConfig) -> Result<(), String> {
 
 pub async fn cleanup_feishu_plugin_install() -> Result<(), String> {
     sanitize_legacy_agent_model_cache().await?;
-    run_shell("openclaw config unset plugins.installs.feishu >/dev/null 2>&1 || true").await?;
+    run_shell_with_legacy_model_retry(
+        "openclaw config unset plugins.installs.feishu >/dev/null 2>&1 || true",
+    )
+    .await?;
 
     let global_dir = global_feishu_extension_dir()?;
     if global_dir.exists() {
@@ -348,7 +369,7 @@ pub async fn cleanup_feishu_plugin_install() -> Result<(), String> {
 
 pub async fn prepare_stock_feishu_plugin() -> Result<(), String> {
     sanitize_legacy_agent_model_cache().await?;
-    run_shell(r#"npm install --prefix "$(npm root -g)/openclaw/extensions/feishu""#).await?;
+    run_shell_with_legacy_model_retry(r#"npm install --prefix "$(npm root -g)/openclaw/extensions/feishu""#).await?;
     Ok(())
 }
 
