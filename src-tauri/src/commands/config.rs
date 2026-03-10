@@ -220,6 +220,15 @@ fn configured_model_key_for_provider(provider: &str) -> Option<&'static str> {
     }
 }
 
+async fn sync_primary_model(model: &str) -> Result<(), String> {
+    run_shell_with_legacy_model_retry(&format!(
+        "openclaw config set agents.defaults.model.primary {}",
+        shell_escape(model)
+    ))
+    .await?;
+    Ok(())
+}
+
 fn applescript_escape(value: &str) -> String {
     value.replace('\\', "\\\\").replace('"', "\\\"")
 }
@@ -317,6 +326,9 @@ async fn sync_provider_config(config: &OpenClawConfig) -> Result<(), String> {
     run_shell_with_legacy_model_retry("openclaw config set gateway.bind custom").await?;
     run_shell_with_legacy_model_retry("openclaw config set gateway.customBindHost 127.0.0.1")
         .await?;
+    if let Some(model_key) = configured_model_key_for_provider(provider) {
+        sync_primary_model(model_key).await?;
+    }
 
     Ok(())
 }
@@ -340,6 +352,14 @@ async fn sync_feishu_config(config: &OpenClawConfig) -> Result<(), String> {
     run_shell_with_legacy_model_retry("openclaw config set plugins.entries.feishu.enabled true")
         .await?;
     run_shell_with_legacy_model_retry("openclaw config set channels.feishu.enabled true").await?;
+    run_shell_with_legacy_model_retry("openclaw config set channels.feishu.defaultAccount main")
+        .await?;
+    run_shell_with_legacy_model_retry("openclaw config set channels.feishu.accounts.main.enabled true")
+        .await?;
+    run_shell_with_legacy_model_retry(
+        "openclaw config set channels.feishu.accounts.default.enabled false",
+    )
+    .await?;
     run_shell_with_legacy_model_retry(&format!(
         "openclaw config set channels.feishu.accounts.main.appId {app_id}"
     ))
@@ -349,7 +369,7 @@ async fn sync_feishu_config(config: &OpenClawConfig) -> Result<(), String> {
     ))
     .await?;
     run_shell_with_legacy_model_retry(&format!(
-        "openclaw config set channels.feishu.accounts.default.dmPolicy {dm_policy}"
+        "openclaw config set channels.feishu.accounts.main.dmPolicy {dm_policy}"
     ))
     .await?;
 
@@ -878,7 +898,7 @@ pub async fn login_model_oauth(provider: String, window: tauri::Window) -> Resul
     }
 
     let command = format!(
-        "{}; openclaw models auth login --provider {} --set-default; openclaw gateway restart; echo; echo 'OAuth 登录完成，可以回养养龙虾继续切模型。'",
+        "{}; openclaw models auth login --provider {} --set-default; openclaw config set agents.defaults.model.primary openai-codex/gpt-5.4; openclaw gateway restart; echo; echo 'OAuth 登录完成，可以回养养龙虾继续切模型。'",
         crate::commands::runtime::SHELL_PATH_PREFIX,
         shell_escape(&provider)
     );
@@ -912,6 +932,7 @@ pub async fn switch_active_model(model: String, window: tauri::Window) -> Result
 
     emit_model_switch_line(&window, format!("开始切换到 {model}…")).await?;
     run_shell(&format!("openclaw models set {}", shell_escape(&model))).await?;
+    sync_primary_model(&model).await?;
     clear_agent_model_cache().await?;
     emit_model_switch_line(&window, "默认模型已更新，正在重启网关…").await?;
 
